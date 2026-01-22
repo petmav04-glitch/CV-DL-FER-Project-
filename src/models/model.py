@@ -109,5 +109,18 @@ def save_checkpoint(
     if extra:
         ckpt.update(extra)
     torch.save(ckpt, path)
+def load_checkpoint(model: nn.Module, ckpt_path: str, *, map_location="cpu") -> Dict:
+    """
+    Loads weights into `model`. Returns metadata dict.
+    Supports:
+      - {model_state_dict: ...}
+      - raw state_dict (legacy)
+    """
+    ckpt = torch.load(ckpt_path, map_location=map_location)
+    if isinstance(ckpt, dict) and "model_state_dict" in ckpt:
+        model.load_state_dict(ckpt["model_state_dict"], strict=True)
+        return ckpt
+    model.load_state_dict(ckpt, strict=True)
+    return {}
 
 
