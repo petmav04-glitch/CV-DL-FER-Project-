@@ -48,7 +48,11 @@ class SimpleCNN(nn.Module):
 
 def build_model(
     name: str = "resnet18",
-    num_classes: int = NUM_CLASSES_DEFAULT,*, class_names: Tuple[str, ...] = CLASS_NAMES_6,) -> ModelSpec: name = name.lower()
+    num_classes: int = NUM_CLASSES_DEFAULT,
+    *,
+    class_names: Tuple[str, ...] = CLASS_NAMES_6,
+) -> ModelSpec:
+    name = name.lower()
 
     if len(class_names) != num_classes:
         raise ValueError(f"class_names length ({len(class_names)}) != num_classes ({num_classes})")
@@ -72,12 +76,18 @@ def build_model(
     raise ValueError(f"Unknown model name: {name}")
 
 
-def save_checkpoint(path: str, model: nn.Module, *,  model_name: str, num_classes: int,  class_names: Tuple[str, ...],
+def save_checkpoint(
+    path: str,
+    model: nn.Module,
+    *,
+    model_name: str,
+    num_classes: int,
+    class_names: Tuple[str, ...],
     epoch: int,
     best_val_acc: float,
-    extra: Optional[Dict] = None,) -> None:
-    
-        ckpt = {
+    extra: Optional[Dict] = None,
+) -> None:
+    ckpt = {
         "model_state_dict": model.state_dict(),
         "model_name": model_name,
         "num_classes": num_classes,
@@ -97,4 +107,3 @@ def load_checkpoint(model: nn.Module, ckpt_path: str, *, map_location="cpu") -> 
         return ckpt
     model.load_state_dict(ckpt, strict=True)
     return {}
-
