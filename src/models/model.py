@@ -23,7 +23,7 @@ class ModelSpec:
 
 
 def _resnet18_from_scratch(num_classes: int) -> nn.Module:
-    model = tv_models.resnet18(weights=None)  # IMPORTANT: random init / from scratch
+    model = tv_models.resnet18(weights=None)  
     model.fc = nn.Linear(model.fc.in_features, num_classes)
     return model
 
@@ -54,14 +54,7 @@ def build_model(
     name: str = "resnet18",
     num_classes: int = NUM_CLASSES_DEFAULT,
     *, class_names: Tuple[str, ...] = CLASS_NAMES_6,) -> ModelSpec:
-    """
-    name:
-      - "resnet18"   : ResNet-18 from scratch (recommended)
-      - "simple_cnn" : lightweight fallback
-
-    input_size:
-      - your pipeline produces 64x64 crops, so default to 64
-    """
+  
     name = name.lower()
 
     if len(class_names) != num_classes:
@@ -72,8 +65,7 @@ def build_model(
             model=_resnet18_from_scratch(num_classes),
             input_size=64,
             num_classes=num_classes,
-            class_names=class_names,
-        )
+            class_names=class_names )
 
     if name == "simple_cnn":
         return ModelSpec(
@@ -89,15 +81,7 @@ def build_model(
 
 def save_checkpoint(
     path: str,
-    model: nn.Module,
-    *,
-    model_name: str,
-    num_classes: int,
-    class_names: Tuple[str, ...],
-    epoch: int,
-    best_val_acc: float,
-    extra: Optional[Dict] = None,
-) -> None:
+    model: nn.Module, *,model_name: str, num_classes: int, class_names: Tuple[str, ...], epoch: int, best_val_acc: float, extra: Optional[Dict] = None,) -> None:
     ckpt = {
         "model_state_dict": model.state_dict(),
         "model_name": model_name,
@@ -110,12 +94,7 @@ def save_checkpoint(
         ckpt.update(extra)
     torch.save(ckpt, path)
 def load_checkpoint(model: nn.Module, ckpt_path: str, *, map_location="cpu") -> Dict:
-    """
-    Loads weights into `model`. Returns metadata dict.
-    Supports:
-      - {model_state_dict: ...}
-      - raw state_dict (legacy)
-    """
+   
     ckpt = torch.load(ckpt_path, map_location=map_location)
     if isinstance(ckpt, dict) and "model_state_dict" in ckpt:
         model.load_state_dict(ckpt["model_state_dict"], strict=True)
