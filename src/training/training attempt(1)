@@ -1,0 +1,5 @@
+model = build_model("resnet18", num_classes=6)
+model = model.to(device)
+
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
