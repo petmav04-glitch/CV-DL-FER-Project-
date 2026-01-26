@@ -141,8 +141,8 @@ for split_name, split_data in [("train", train), ("val", val), ("test", test)]:
         target_dir = base / split_name / emotion
         target_dir.mkdir(parents=True, exist_ok=True)
         
-
+        # emotion_data already contains base64-encoded images from the first loop
         csv_path = target_dir / "data.csv"
-        pd.DataFrame(processed_samples).to_csv(csv_path, index=False)
+        pd.DataFrame(emotion_data).to_csv(csv_path, index=False)
         
-        print(f"Saved {len(processed_samples)} processed samples for {split_name}/{emotion} to {csv_path}")
+        print(f"Saved {len(emotion_data)} processed samples for {split_name}/{emotion} to {csv_path}")
