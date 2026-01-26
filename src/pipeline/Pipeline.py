@@ -5,7 +5,7 @@ import torch
 from collections import defaultdict, Counter
 import random
 from pathlib import Path
-import shutil
+import pandas as pd
 
 PipelineDir = Path(__file__).resolve().parent
 SrcDir = PipelineDir.parent
@@ -62,7 +62,7 @@ def processImage(image):
 
 emotions = ["angry", "disgust", "fear", "happy", "sad", "surprise"]
 splits = ["train", "test"]
-datasets = ["AffectNet", "FER2013", "RAF-DB"]
+datasets = ["FER2013"] #["AffectNet", "FER2013", "RAF-DB"]
 samples = []
 
 for dataset in datasets:
@@ -88,15 +88,9 @@ for dataset in datasets:
                     else:
                         image = image.resize((64, 64))
 
-                    out_dir = ProcessedDir / emotion
-                    out_dir.mkdir(parents=True, exist_ok=True)
-
-                    out_path = out_dir / f"{emotion}_{get_emotionCounter(emotion)}.jpg"
-                    image.save(out_path)
-
                     print("Step:", imagecounter,"| Dataset:", dataset,"| Original Split:", split,"| Emotion:", emotion)
 
-                    samples.append({"path": str(out_path),"emotion": emotion,"dataset": dataset})
+                    samples.append({"path": str(image_path),"emotion": emotion,"dataset": dataset})
 
 
 groups = defaultdict(list)
@@ -132,13 +126,15 @@ for group in groups.values():
 base = ProcessedDir / "split_data"
 
 for split_name, split_data in [("train", train), ("val", val), ("test", test)]:
+    emotion_groups = defaultdict(list)
     for s in split_data:
-        src = Path(s["path"])
-        if not src.exists():
-            print("Missing:", src)
-            continue
-
-        target_dir = base / split_name / s["emotion"]
+        emotion_groups[s["emotion"]].append(s)
+    
+    for emotion, emotion_data in emotion_groups.items():
+        target_dir = base / split_name / emotion
         target_dir.mkdir(parents=True, exist_ok=True)
-
-        shutil.copy(src, target_dir / src.name)
+        
+        csv_path = target_dir / "data.csv"
+        pd.DataFrame(emotion_data).to_csv(csv_path, index=False)
+        
+        print(f"Saved {len(emotion_data)} samples for {split_name}/{emotion} to {csv_path}")
