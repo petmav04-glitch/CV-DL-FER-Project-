@@ -50,7 +50,7 @@ print(f"Previous best validation F1: {checkpoint.get('val_f1', 0.0):.4f}")
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)  # Lower LR for fine-tuning
 
-# Batch size - use 16 for shared GPU memory
+# Batch size 
 batch_size = 16
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2, pin_memory=False)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=2, pin_memory=False)
