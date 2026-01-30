@@ -48,9 +48,10 @@ scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
     optimizer, mode='max', factor=0.5, patience=5, min_lr=1e-6
 )
 
-# Improved: Larger batch size if GPU memory allows
-train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=4, pin_memory=True)
-val_loader = DataLoader(val_dataset, batch_size=128, shuffle=False, num_workers=4, pin_memory=True)
+# Batch size - reduced to 32 for shared GPU memory (adjust if you have dedicated GPU)
+batch_size = 32
+train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True)
+val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True)
 
 print("\nStarting improved training...\n")
 print("Improvements:")
@@ -58,7 +59,7 @@ print("  - Lower learning rate (5e-4)")
 print("  - Weight decay regularization (1e-4)")
 print("  - Learning rate scheduler (ReduceLROnPlateau)")
 print("  - Class-weighted loss for imbalanced data")
-print("  - Larger batch size (128)")
+print(f"  - Batch size ({batch_size})")
 print("  - More data loader workers (4)")
 print()
 
