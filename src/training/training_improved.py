@@ -29,8 +29,7 @@ print(f"Validation samples: {len(val_dataset)}")
 model = build_model("resnet18", num_classes=num_classes, input_channels=1, small_input=True)
 model = model.to(device)
 
-# Improved: Use class weights for imbalanced data (if needed)
-# Calculate class weights based on training data distribution
+# Improved: Use class weights for imbalanced data
 from collections import Counter
 train_labels_list = [train_dataset[i][1] for i in range(len(train_dataset))]
 class_counts = Counter(train_labels_list)
@@ -46,10 +45,10 @@ optimizer = torch.optim.Adam(model.parameters(), lr=5e-4, weight_decay=1e-4)
 
 # Improved: Learning rate scheduler - reduce LR when plateau
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-    optimizer, mode='max', factor=0.5, patience=5, verbose=True, min_lr=1e-6
+    optimizer, mode='max', factor=0.5, patience=5, min_lr=1e-6
 )
 
-# Improved: Larger batch size if GPU memory allows, more workers
+# Improved: Larger batch size if GPU memory allows
 train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=4, pin_memory=True)
 val_loader = DataLoader(val_dataset, batch_size=128, shuffle=False, num_workers=4, pin_memory=True)
 
@@ -69,10 +68,10 @@ save_dir.mkdir(exist_ok=True)
 checkpoints_dir = save_dir / 'checkpoints'
 checkpoints_dir.mkdir(exist_ok=True)
 
-num_epochs = 150  # Increased max epochs
+num_epochs = 150 
 best_f1 = 0.0
 best_epoch = 0
-patience = 15  # Increased patience for LR scheduler to work
+patience = 15  
 patience_counter = 0
 
 for epoch in range(num_epochs):
