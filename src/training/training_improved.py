@@ -11,6 +11,11 @@ from src.evaluation import calculate_macro_f1_score, print_evaluation_summary
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
+# Clear GPU cache to free memory
+if torch.cuda.is_available():
+    torch.cuda.empty_cache()
+    print(f"GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1e9:.2f} GB")
+
 # Check if datasets have data
 if len(train_dataset) == 0:
     raise ValueError("No training data found! Make sure the pipeline has been run.")
@@ -48,10 +53,10 @@ scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
     optimizer, mode='max', factor=0.5, patience=5, min_lr=1e-6
 )
 
-# Batch size - reduced to 32 for shared GPU memory (adjust if you have dedicated GPU)
-batch_size = 32
-train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True)
-val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True)
+# Batch size - reduced to 16 for shared GPU memory (very limited GPU)
+batch_size = 16
+train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2, pin_memory=False)
+val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=2, pin_memory=False)
 
 print("\nStarting improved training...\n")
 print("Improvements:")
@@ -94,6 +99,10 @@ for epoch in range(num_epochs):
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         
         optimizer.step()
+        
+        # Clear cache periodically to free memory
+        if (total + 1) % 100 == 0 and torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
         total_loss += loss.item() * x.size(0)
         pred = logits.argmax(dim=1)
