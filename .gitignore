@@ -12,9 +12,11 @@ data/processed/*
 
 # Training outputs
 *.pt
+!experiments_finetuned/best_model.pt  # Allow best model for sharing
 *.pth
 experiments/*
 !experiments/.gitkeep
+!experiments_finetuned/  # Allow finetuned experiments directory
 
 # IDE
 .vscode/
